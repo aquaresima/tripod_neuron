@@ -29,7 +29,7 @@ The figures generated may present small variations to the ones presented in the 
 This code base is using the Julia Language and [DrWatson](https://juliadynamics.github.io/DrWatson.jl/stable/) to make a reproducible scientific project named
 > Tripod
 
-The Julia version used: `julia = "1.7.2"`
+The Julia version used: `julia = "1.8.2"`
 
 To (locally) reproduce this project, do the following:
 
