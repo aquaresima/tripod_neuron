@@ -9,7 +9,7 @@ include("stimuli.jl")
 include(projectdir("scripts","dendritic_memory","default_plots.jl"));
 using JLD2
 
-file =datadir("dendritic_memory","transitions_corr_data_#1.jld2")
+file =datadir("dendritic_memory","transitions_corr_data.jld2")
 
 fid = JLD2.load(file)
 scores_oscillation = fid["scores_oscillation"]

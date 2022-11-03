@@ -24,7 +24,7 @@ Random.seed!(45)
 simtime = 2_500
 signal = oscillating_signal(simtime, 200 )
 stimuli = get_stimuli(signal)
-inputs = TN.make_spikes(simtime; rate=3000)
+inputs = TN.make_spikes(simtime; rate=1200)
 apply_stimuli!(stimuli, inputs, soma=false)
 
 
