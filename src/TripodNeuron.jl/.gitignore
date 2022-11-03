@@ -1,0 +1,16 @@
+old_tripod/
+*.svg
+**/*.pdf
+*.pdf
+.*_checkpoints
+cluster/**/
+*.gif
+.nfs*
+*.aux
+*.out
+*.log
+paper_analysis/response_function/EXC*
+other_analysis/
+*.jld
+*.png
+*.h5
