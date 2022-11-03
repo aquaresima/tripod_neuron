@@ -1,9 +1,0 @@
-[submodule "src/TripodNeuron.jl"]
-	path = src/TripodNeuron.jl
-	url = git@gitlab.gwdg.de:nbl-computation/tripod.git
-[submodule "src/TripodNetwork.jl"]
-	path = src/TripodNetwork.jl
-	url = git@gitlab.gwdg.de:nbl-computation/tripod_network
-[submodule "src/Conductor.jl"]
-	path = src/Conductor.jl
-	url = git@github.com:aquaresima/Conductor.jl.git
