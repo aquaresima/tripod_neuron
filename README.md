@@ -1,11 +1,14 @@
 # Tripod Neuron
 -------------
 
-The code presented here simulates a three-compartments neuron model. This package serves for reproducibility and future work based on the journal article (under review):
+The code presented here simulates a three-compartments neuron model. This package serves for reproducibility and future work based on two journal articles:
 
-__"The Tripod neuron: a minimal structural reduction of the
-dendritic tree"__
 
+1. [__The Tripod neuron: a minimal structural reduction of the dendritic tree__](https://physoc.onlinelibrary.wiley.com/doi/10.1113/JP283399)
+
+2. __Nonlinear dendritic integration supports Up-Down states in single neurons__
+
+The code in the branch `master` correspond to the one used in the second paper. It should be compatible also for the experiments in (1); if it is not, please use the code in the branch 'JPhysol2022'.
 
 The package is composed of five folders:
 
