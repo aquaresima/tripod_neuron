@@ -29,6 +29,10 @@ end
     return (1 + (Mg_mM / NMDA.b) * exp32(NMDA.k * (v)))^-1 ##NMDA
 end
 
+@inline function GABABKIR_nonlinear(GABAb::Receptor, v::Float32)::Float32
+    return 15_000 * (1 + exp256(1.0f-1 * (v - GABAb.E_rev + 10.0f0)))^-1 ##GABAB
+end
+
 @inline function syn_current(v::Float32, g::AbstractVector{Float32}, syn::Synapse)::Float32
     return (syn.AMPA.gsyn * g[1] + syn.NMDA.gsyn * g[2] * NMDA_nonlinear(syn.NMDA, v)) *
            (v) +
@@ -36,6 +40,42 @@ end
            syn.GABAb.gsyn * (v - syn.GABAb.E_rev) * g[4]
 end
 
+@inline function syn_current_glu(
+    v::Float32,
+    g::AbstractVector{Float32},
+    syn::Synapse,
+)::Float32
+    return (g[1] + g[2] * NMDA_nonlinear(syn.NMDA, v)) * (v)
+end
+
+@inline function syn_current_gaba(
+    v::Float32,
+    g::AbstractVector{Float32},
+    syn::Synapse,
+)::Float32
+    return (v - syn.GABAa.E_rev) * g[3] + (v - syn.GABAb.E_rev) * g[4]
+end
+
+@inline function syn_current_tot(
+    v::Float32,
+    g::AbstractVector{Float32},
+    syn::Synapse,
+)::Float32
+    return (v - syn.GABAa.E_rev) * g[3] +
+           (v - syn.GABAb.E_rev) * g[4] +
+           (g[1] + g[2] * NMDA_nonlinear(syn.NMDA, v)) * (v)
+end
+
+@inline function syn_current_GABABKIR(
+    v::Float32,
+    g::AbstractVector{Float32},
+    syn::Synapse,
+)::Float32
+    return (syn.AMPA.gsyn * g[1] + syn.NMDA.gsyn * g[2] * NMDA_nonlinear(syn.NMDA, v)) *
+           (v) +
+           syn.GABAa.gsyn * (v - syn.GABAa.E_rev) * g[3] +
+           syn.GABAb.gsyn * (v - syn.GABAb.E_rev) * g[4] * GABABKIR_nonlinear(syn.GABAb, v)
+end
 ##  Integration methods
 #Heun integration
 # y' = f(y)
@@ -79,7 +119,7 @@ end
     syn::Synapse,
 )::Float32
     i = syn_current(v, g, syn)
-    return pm.C⁻ * (-(v - pm.Er) / pm.Rm - min(abs(i), 1500) * sign(i) - axial)
+    return pm.C⁻ * (-(v - pm.Er) / pm.Rm - min(abs(i), 1000) * sign(i) - axial)
 end
 
 @inline function _Δv_soma(
