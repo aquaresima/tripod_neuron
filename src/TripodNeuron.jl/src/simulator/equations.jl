@@ -1,36 +1,12 @@
-@inline function exp32(x::Float32)::Float32
-    x = ifelse(x < -10.0f0, -32.0f0, x)
-    x = 1.0f0 + x / 32.0f0
-    x *= x
-    x *= x
-    x *= x
-    x *= x
-    x *= x
-    return x
-end
-
-@inline function exp256(x::Float32)::Float32
-    x = ifelse(x < -10.0f0, -256.0f0, x)
-    x = 1.0f0 + x / 256.0f0
-    x *= x
-    x *= x
-    x *= x
-    x *= x
-    x *= x
-    x *= x
-    x *= x
-    x *= x
-    return x
-end
 
 
 @inline function NMDA_nonlinear(NMDA::ReceptorVoltage, v::Float32)::Float32
     Mg_mM = 1.0
-    return (1 + (Mg_mM / NMDA.b) * exp32(NMDA.k * (v)))^-1 ##NMDA
+    return (1 + (Mg_mM / NMDA.b) * exp(NMDA.k * (v)))^-1 ##NMDA
 end
 
 @inline function GABABKIR_nonlinear(GABAb::Receptor, v::Float32)::Float32
-    return 15_000 * (1 + exp256(1.0f-1 * (v - GABAb.E_rev + 10.0f0)))^-1 ##GABAB
+    return 15_000 * (1 + exp(1.0f-1 * (v - GABAb.E_rev + 10.0f0)))^-1 ##GABAB
 end
 
 @inline function syn_current(v::Float32, g::AbstractVector{Float32}, syn::Synapse)::Float32
@@ -133,7 +109,7 @@ end
 )::Float32
     @unpack gl, C⁻, Er, ΔT, ΔT⁻ = Neuron
     return C⁻ *
-           (gl * (-v + Er + ΔT * exp32(ΔT⁻ * (v - θ))) - w - syn_current(v, g, syn) - axial) ## external currents
+           (gl * (-v + Er + ΔT * exp(ΔT⁻ * (v - θ))) - w - syn_current(v, g, syn) - axial) ## external currents
 end
 
 @inline function Δw_soma(v::Float32, w::Float32, Neuron::NeuronParams)::Float32
@@ -156,8 +132,8 @@ end
 ##
 
 function double_exp(syn_arr::AbstractVector{Float32}, syn)
-    syn_arr[2] = exp32(-dt * syn.τd⁻) * (syn_arr[2] + dt * syn_arr[1])#),13500)
-    syn_arr[1] = exp32(-dt * syn.τr⁻) * (syn_arr[1])
+    syn_arr[2] = exp(-dt * syn.τd⁻) * (syn_arr[2] + dt * syn_arr[1])#),13500)
+    syn_arr[1] = exp(-dt * syn.τr⁻) * (syn_arr[1])
 end
 
 
