@@ -8,7 +8,7 @@ using ProgressBars
 include(projectdir("scripts", "plots", "default_plots.jl"))
 include(projectdir("scripts", "up_down", "updown_analysis.jl"))
 
-simtime = 50_0000+ 1000
+simtime = 50_0000 + 1000
 τ = 50
 @unpack νs = TN
 AdEx = TN.AdExParams(idle = 0.1, up = 0.1, u_r = -55)
@@ -26,21 +26,33 @@ for n in [2]
         Random.seed!(133)
         samples = map(1:50) do x
             cond = TN.get_balance_conditions(model.ds..., _rate; nmda = true)
-            inputs = TN.make_spikes(simtime, β; cond..., τ = τ, seed=x)
-            voltage =
-                TN.run_tripod(inputs, simtime; model..., cond..., AdEx = AdEx, do_spikes = true)
+            inputs = TN.make_spikes(simtime, β; cond..., τ = τ, seed = x)
+            voltage = TN.run_tripod(
+                inputs,
+                simtime;
+                model...,
+                cond...,
+                AdEx = AdEx,
+                do_spikes = true,
+            )
             v = voltage[1, 1_0001:end]
             v
         end
         vv = vcat(samples...)
         NMDA = updown_analysis(vv)
-        
+
         Random.seed!(133)
         samples = map(1:50) do x
             cond = TN.get_balance_conditions(model.ds..., _rate; nmda = false)
-            inputs = TN.make_spikes(simtime, β; cond..., τ = τ, seed=x)
-            voltage =
-                TN.run_tripod(inputs, simtime; model..., cond..., AdEx = AdEx, do_spikes = true)
+            inputs = TN.make_spikes(simtime, β; cond..., τ = τ, seed = x)
+            voltage = TN.run_tripod(
+                inputs,
+                simtime;
+                model...,
+                cond...,
+                AdEx = AdEx,
+                do_spikes = true,
+            )
             v = voltage[1, 1_0001:end]
             v
         end
@@ -78,4 +90,3 @@ Threads.@threads for _rate in eachindex(rates)
 end
 data = @strdict condition = data rates
 save(datadir("up_down", "bistability", "stimulus_rate_$τ.jld2"), data)
-

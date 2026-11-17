@@ -1,5 +1,5 @@
 using Pkg
-Pkg.activate("@v1.10")
+# Pkg.activate("@v1.10")
 using StatsPlots, UncertainData, RollingFunctions
 
 using DrWatson
@@ -91,17 +91,17 @@ p1
 ## Spike voltage correlation
 f(x) = x > 0.001 ? "p = $(round(x, digits=2))" : "p < 10ˆ-3 "
 nonzero = findall(NMDA.up[4, :] .> 0)
-cNMDA = cor(NMDA.up[2, nonzero], NMDA.up[4, nonzero]) |> x->round(x, digits=2)
-pnmda = pvalue(OneSampleZTest(atanh(cNMDA),1, length(NMDA.up[2,nonzero]))) |> f
+cNMDA = cor(NMDA.up[2, nonzero], NMDA.up[4, nonzero]) |> x -> round(x, digits = 2)
+pnmda = pvalue(OneSampleZTest(atanh(cNMDA), 1, length(NMDA.up[2, nonzero]))) |> f
 nonzero = findall(AMPA.up[4, :] .> 0)
-cAMPA = cor(AMPA.up[2, nonzero], AMPA.up[4, nonzero]) |> x->round(x, digits=2)
-pampa = pvalue(OneSampleZTest(atanh(cAMPA),1, length(AMPA.up[2,nonzero]))) |> f
+cAMPA = cor(AMPA.up[2, nonzero], AMPA.up[4, nonzero]) |> x -> round(x, digits = 2)
+pampa = pvalue(OneSampleZTest(atanh(cAMPA), 1, length(AMPA.up[2, nonzero]))) |> f
 nonzero = findall(SOMA.up[4, :] .> 0)
 cSOMA = cor(SOMA.up[2, nonzero], SOMA.up[4, nonzero])
-psoma = pvalue(OneSampleZTest(atanh(cSOMA),1, length(SOMA.up[2,nonzero]))) |>f
+psoma = pvalue(OneSampleZTest(atanh(cSOMA), 1, length(SOMA.up[2, nonzero]))) |> f
 nonzero = findall(SOMA.up[4, :] .> 0)
 
-cortest(x,y) =
+cortest(x, y) =
     if length(x) == length(y)
         2 * ccdf(Normal(), atanh(abs(cor(x, y))) * sqrt(length(x) - 3))
     else
@@ -110,7 +110,7 @@ cortest(x,y) =
 
 using HypothesisTests
 
-NMDA.up[2,nonzero]
+NMDA.up[2, nonzero]
 
 
 
@@ -122,8 +122,8 @@ p2 = plot(
         c = :darkblue,
         title = "NMDA \nρ = $cNMDA; $pnmda",
         msc = :darkblue,
-        smooth=true,
-        lc=:grey,
+        smooth = true,
+        lc = :grey,
         lw = 4,
         ms = 4,
     ),
@@ -134,8 +134,8 @@ p2 = plot(
         c = :darkred,
         title = "AMPA \nρ = $cAMPA; $pampa",
         msc = :darkred,
-        smooth=true,
-        lc=:grey,
+        smooth = true,
+        lc = :grey,
         lw = 4,
         ms = 4,
     ),
@@ -156,34 +156,32 @@ p2 = plot(
     xticks = (-62:5:-50),
     yticks = 0:30:60,
     ylims = (-5, 60),
-    titlefontsize=10,
-    frame=:axes, 
-    rightmargin=3Plots.mm,
-    leftmargin=3Plots.mm
+    titlefontsize = 10,
+    frame = :axes,
+    rightmargin = 3Plots.mm,
+    leftmargin = 3Plots.mm,
 )
-p2_intermedia = plot(p2,bottommargin = 10Plots.mm, size=(600,400))
+p2_intermedia = plot(p2, bottommargin = 10Plots.mm, size = (600, 400))
 # savefig(p2, joinpath(path, "Fig7_firing rate.pdf"))
 p2
 ##
 
-_std_err =
-    std.([
-        NMDA.up[3, :],
-        NMDA.down[3, :],
-        AMPA.up[3, :],
-        AMPA.down[3, :],
-        # SOMA.up[3, :],
-        # SOMA.down[3, :],
-    ])
-_std =
-    mean.([
-        NMDA.up[3, :],
-        NMDA.down[3, :],
-        AMPA.up[3, :],
-        AMPA.down[3, :],
-        # SOMA.up[3, :],
-        # SOMA.down[3, :],
-    ])
+_std_err = std.([
+    NMDA.up[3, :],
+    NMDA.down[3, :],
+    AMPA.up[3, :],
+    AMPA.down[3, :],
+    # SOMA.up[3, :],
+    # SOMA.down[3, :],
+])
+_std = mean.([
+    NMDA.up[3, :],
+    NMDA.down[3, :],
+    AMPA.up[3, :],
+    AMPA.down[3, :],
+    # SOMA.up[3, :],
+    # SOMA.down[3, :],
+])
 _mean = ([
     NMDA.up[2, :],
     NMDA.down[2, :],
@@ -241,12 +239,12 @@ for n in [1, 2]
     i = 2 * n - 1
     m = mean.(_mean)
     v = std.(_mean)
-    l = round.(Int, length.(_mean) ) 
+    l = round.(Int, length.(_mean))
     # @info OneSampleTTest(m[i]-m[i+1], v[i], l[i])
     @info string(mean(_mean[i]), " ", mean(_mean[i+1]))
-    cd = CohenD(_mean[i],_mean[i+1], quantile=0.99)
+    cd = CohenD(_mean[i], _mean[i+1], quantile = 0.99)
     ci = confint(cd)
-    @info string(effectsize(cd),"-", lower(ci), "-", upper(ci))
+    @info string(effectsize(cd), "-", lower(ci), "-", upper(ci))
 end
 
 _mean
@@ -265,16 +263,16 @@ layout = @layout [
 ]
 pp1 =
     plot(p1, p2, layout = layout, size = (700, 800), legend = false, leftmargin = 5Plots.mm)
-plot!(p3, ylims=(-70,-50))
+plot!(p3, ylims = (-70, -50))
 pp2 = plot(
     p3,
     p4,
-    layout = (1,2),
+    layout = (1, 2),
     size = (600, 400),
     legend = false,
     topmargin = 10mm,
     bottommarging = 10mm,
-    frame= :axes
+    frame = :axes,
 )
 
 savefig(pp2, joinpath(path, "Fig7_experimental_average.pdf"))
@@ -350,7 +348,7 @@ z1 = plot(
     xlims = (0, 8),
     topmargin = 10Plots.mm,
     yticks = :none,
-    title= "UP"
+    title = "UP",
     # xticks = :none,
 )
 
@@ -373,7 +371,7 @@ z2 = plot(
         "NMDA",
         color = :darkblue,
         legend = false,
-        ylabel="Cumulative probability (%)",
+        ylabel = "Cumulative probability (%)",
         leftmargin = 10Plots.mm,
         yticks = (0:0.2:1, 0:20:100),
     ),
@@ -394,12 +392,20 @@ z2 = plot(
     ylims = (0, 1),
     xlims = (0, 5),
     bottommargin = 10Plots.mm,
-    title= "DOWN",
+    title = "DOWN",
     topmargin = 3mm,
 )
-zz1 = plot(z2, z1, layout = (1, 3), size = (400, 400), leftmargin=3Plots.mm, rightmargin=3Plots.mm, frame=:axes)
-plot!(zz1, subplot=2, rightmargin=10Plots.mm)
-plot!(zz1, subplot=1, leftmargin=10Plots.mm, size=(600,400))
+zz1 = plot(
+    z2,
+    z1,
+    layout = (1, 3),
+    size = (400, 400),
+    leftmargin = 3Plots.mm,
+    rightmargin = 3Plots.mm,
+    frame = :axes,
+)
+plot!(zz1, subplot = 2, rightmargin = 10Plots.mm)
+plot!(zz1, subplot = 1, leftmargin = 10Plots.mm, size = (600, 400))
 ##
 
 ## APPENDIX
@@ -422,7 +428,7 @@ for (v, c, t) in zip(
         mean(hcat([v[x] for x in upstart]...), dims = 2)[:, 1],
         legend = false,
         c = c,
-        lw=3,
+        lw = 3,
         title = t,
     )
     plot!(yticks = :none)
@@ -494,12 +500,12 @@ zz2 = plot(
     layout = (2, 1),
     size = (700, 400),
     legend = false,
-    xlims=(-50,2050),
+    xlims = (-50, 2050),
     leftmargin = 5Plots.mm,
 )
 
 layout = @layout [a{0.48w} _ b{0.48w}]
-zz = plot(zz1, zz2, layout = layout, size = (1400, 400), frame=:axes)
+zz = plot(zz1, zz2, layout = layout, size = (1400, 400), frame = :axes)
 path = mkpath(plotsdir("up-down", "Figures"))
 savefig(zz, joinpath(path, "Fig7_experimental.pdf"))
 

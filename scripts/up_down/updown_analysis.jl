@@ -102,3 +102,9 @@ end
 function cum_prob(x)
     return cumsum(x ./ sum(x))
 end
+
+function cap_voltage(v)
+    vv = copy(v)
+    vv[v.>TN.AdEx.θ] .= TN.AdEx.θ
+    return vv
+end

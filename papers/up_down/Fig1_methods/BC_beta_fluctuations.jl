@@ -10,24 +10,24 @@ include(projectdir("scripts", "up_down", "default_plots.jl"))
 simtime = 1_0000
 rate = 1.5
 r = []
-βs =  0:60:480
-for β = βs
-    push!(r, TN.make_rates(simtime,β,rate=rate, seed = 29))
+βs = 0:60:480
+for β in βs
+    push!(r, TN.make_rates(simtime, β, rate = rate, seed = 29))
 end
 ##
 all_spikes = []
-for i = eachindex(βs)
+for i in eachindex(βs)
     β = βs[i]
-	r_exc = zeros(3,simtime)
-	r_inh = zeros(3,simtime)
-    for n in 1:3
-        r_exc[n,:] = r[i]
+    r_exc = zeros(3, simtime)
+    r_inh = zeros(3, simtime)
+    for n = 1:3
+        r_exc[n, :] = r[i]
         # TN.make_rates(simtime,β,rate=rate)
-        r_inh[n,:] = TN.make_rates(simtime,0,rate=rate)
+        r_inh[n, :] = TN.make_rates(simtime, 0, rate = rate)
     end
-	rates = r_exc, r_inh
+    rates = r_exc, r_inh
     for _ = 1:35
-        spikes = TN.make_spikes(simtime, β, rate = 1.5, rates=rates)[2, :]
+        spikes = TN.make_spikes(simtime, β, rate = 1.5, rates = rates)[2, :]
         push!(all_spikes, (findall(spikes .> 0)) .* TN.dt * 1000)
         # cv = findall(spikes.>0)*TN.dt |> TN.get_isi |>TN.CV_isi
         # @info cv
@@ -45,11 +45,11 @@ Spiketimes = Vector{Vector{Float32}}
 p = raster_plot(Spiketimes(all_spikes))
 #
 
-up_r=Vector{}()
-for i = eachindex(βs)
+up_r = Vector{}()
+for i in eachindex(βs)
     β = βs[i]
     # r[i] .= TN.make_rates(1_0000, β, rate = rate) ./ 100 .+ β / 2)
-    push!(up_r, 10*r[i] .+ β * 3/4)  #./ 100 .+ β / 2))
+    push!(up_r, 10 * r[i] .+ β * 3 / 4)  #./ 100 .+ β / 2))
 end
 
 up_r

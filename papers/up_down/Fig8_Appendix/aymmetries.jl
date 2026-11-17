@@ -91,7 +91,13 @@ p2 = plot(
 v = NMDA.rate
 
 p = plot()
-plot!(νs, mean(v[2, 2:end, 2:end, :], dims = (1, 2))[1, 1, :], label = "All", c=:black, ls=:dash)
+plot!(
+    νs,
+    mean(v[2, 2:end, 2:end, :], dims = (1, 2))[1, 1, :],
+    label = "All",
+    c = :black,
+    ls = :dash,
+)
 plot!(νs, mean(v[2, 2:22, 2:22, :], dims = (1, 2))[1, 1, :], label = "Proximal")
 plot!(νs, mean(v[2, 23:end, 2:22, :], dims = (1, 2))[1, 1, :], label = "Asymmetrical")
 plot!(νs, mean(v[2, 23:end, 23:end, :], dims = (1, 2))[1, 1, :], label = "Distal")
@@ -100,7 +106,13 @@ annotate!(0.1, 2.2, text("B", 20, :center))
 
 v = AMPA.rate
 q = plot()
-plot!(νs, mean(v[2, 2:end, 2:end, :], dims = (1, 2))[1, 1, :], label = "All", c=:black, ls=:dash)
+plot!(
+    νs,
+    mean(v[2, 2:end, 2:end, :], dims = (1, 2))[1, 1, :],
+    label = "All",
+    c = :black,
+    ls = :dash,
+)
 plot!(νs, mean(v[2, 2:22, 2:22, :], dims = (1, 2))[1, 1, :], label = "Proximal")
 plot!(νs, mean(v[2, 23:end, 2:22, :], dims = (1, 2))[1, 1, :], label = "Asymmetrical")
 plot!(νs, mean(v[2, 23:end, 23:end, :], dims = (1, 2))[1, 1, :], label = "Distal")
@@ -151,7 +163,7 @@ p4 = plot(
 )
 #
 p = plot(p2, p3, p4, p1, layout = (4, 1), size = (800, 1200), leftmargin = 10mm)
-p = plot(p4,p3, p1, layout=(3,1), size=(800,1000))
+p = plot(p4, p3, p1, layout = (3, 1), size = (800, 1000))
 
 savefig(p, plotsdir("up_down", "Figures", "Fig7_Appendix.pdf"))
 #:])

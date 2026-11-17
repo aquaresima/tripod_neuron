@@ -17,36 +17,41 @@ the accepted condition.
 using DrWatson
 @quickactivate "Tripod"
 using TripodNeuron
-include(projectdir("scripts","dendritic_memory","default_plots.jl"));
-using StatsBase, Statistics, HDF5 
+include(projectdir("scripts", "dendritic_memory", "default_plots.jl"));
+using StatsBase, Statistics, HDF5
 using MLDataUtils, MLJLinearModels, RollingFunctions
 using ProgressBars, Logging
 
 include("stimuli.jl")
 
-function _trainclassifier(;OP::Symbol, X::Matrix{Float64},inputs::Vector{Symbol}, λ=0.5::Float64)
-    y = ones(size(inputs))*-1
+function _trainclassifier(;
+    OP::Symbol,
+    X::Matrix{Float64},
+    inputs::Vector{Symbol},
+    λ = 0.5::Float64,
+)
+    y = ones(size(inputs)) * -1
     for i in eachindex(inputs)
-        (inputs[i] ∈ getfield(operators,OP)) && (y[i] = 1)
+        (inputs[i] ∈ getfield(operators, OP)) && (y[i] = 1)
     end
-    train_std = StatsBase.fit(ZScoreTransform, X, dims=2)
-    StatsBase.transform!(train_std,X)
+    train_std = StatsBase.fit(ZScoreTransform, X, dims = 2)
+    StatsBase.transform!(train_std, X)
     intercept = true
     # deploy MultinomialRegression from MLJLinearModels, λ being the strenght of the reguliser
-    lr = LogisticRegression(λ; fit_intercept=intercept)
+    lr = LogisticRegression(λ; fit_intercept = intercept)
     # Fit the model
-    θ  = MLJLinearModels.fit(lr, X', y)
+    θ = MLJLinearModels.fit(lr, X', y)
     return (θ, train_std)
 end
 
-function _testclassifier(;OP::Symbol, X::Matrix{Float64},inputs::Vector{Symbol}, lr)
-    y = ones(size(inputs))*-1
+function _testclassifier(; OP::Symbol, X::Matrix{Float64}, inputs::Vector{Symbol}, lr)
+    y = ones(size(inputs)) * -1
     for i in eachindex(inputs)
-        (inputs[i] ∈ getfield(operators,OP)) && (y[i] = 1)
+        (inputs[i] ∈ getfield(operators, OP)) && (y[i] = 1)
     end
     θ, train_std = lr
-    StatsBase.transform!(train_std,X)
-    preds = MLJLinearModels.apply_X(X',θ)
+    StatsBase.transform!(train_std, X)
+    preds = MLJLinearModels.apply_X(X', θ)
     # #and evaluate the model over the labels
     score = mean(sign.(preds) .== y)
     return score, [inputs, sign.(preds), y]
@@ -56,18 +61,23 @@ function train_classifiers(X::Matrix{Float64}, inputs::Vector{Symbol})
     classifiers = []
     _ops = []
     for op in keys(operators)
-        lr = _trainclassifier(OP=op, X=X,inputs=inputs; λ=0.5::Float64)
+        lr = _trainclassifier(OP = op, X = X, inputs = inputs; λ = 0.5::Float64)
         push!(classifiers, lr)
         push!(_ops, op)
     end
-    return (;zip(_ops,classifiers)...)
+    return (; zip(_ops, classifiers)...)
 end
 
-function test_classifiers(X::Matrix{Float64}, inputs::Vector{Symbol}, classifiers::NamedTuple)
+function test_classifiers(
+    X::Matrix{Float64},
+    inputs::Vector{Symbol},
+    classifiers::NamedTuple,
+)
     scores = []
     confusion = []
     for op in keys(operators)
-        score, data = _testclassifier(OP=op, X=X,inputs=inputs,lr=getfield(classifiers,op))
+        score, data =
+            _testclassifier(OP = op, X = X, inputs = inputs, lr = getfield(classifiers, op))
         push!(scores, score)
         push!(confusion, data)
     end
@@ -97,15 +107,15 @@ scores = Dict{}()
 confusions = Dict{}()
 Threads.@threads for m in eachindex(models)
     model = models[m]
-    label=TN.labels[m]
-    score, confusion = test_model(model, n_symbols , symbol_time )
-    print( label,":\n", round.(score, digits=3),"\n")
-    push!(scores,label => score )
-    push!(confusions, label =>confusion )
+    label = TN.labels[m]
+    score, confusion = test_model(model, n_symbols, symbol_time)
+    print(label, ":\n", round.(score, digits = 3), "\n")
+    push!(scores, label => score)
+    push!(confusions, label => confusion)
 end
 #
 
 TN.labels
-file =datadir("dendritic_memory","logic_ops_data.jld2")
+file = datadir("dendritic_memory", "logic_ops_data.jld2")
 data = @strdict confusions scores symbol_time n_symbols conditions operators
 safesave(file, data)
